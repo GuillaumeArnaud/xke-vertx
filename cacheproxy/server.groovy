@@ -1,9 +1,9 @@
 import org.vertx.groovy.core.http.RouteMatcher
-import org.vertx.groovy.core.buffer.Buffer
+import org.vertx.java.core.json.impl.Json
 
 // configure mongo (default port is 27017) to address "xke:cache" and base "xke"
 def mongoConf = [
-        "address": "xke:cache",
+        "address": "xke.cache",
         "host": "localhost",
         "port": 27017,
         "db_name": "xke"
@@ -11,60 +11,102 @@ def mongoConf = [
 
 def routeMatcher = new RouteMatcher()
 
+// declare the logger vertx
+def logger = container.logger
+
 // declare the mongo persistor mods. That will download the module at the first start and will create a 'mods' directory
 // to the working directory.
 container.with {
-    deployModule('vertx.mongo-persistor-v1.0', mongoConf)
+    deployModule('vertx.mongo-persistor-v1.0', mongoConf, 1)
 }
 
 // declare the event bus
 def evtBus = vertx.eventBus
 
+// declare the share map
+def cacheL2 = vertx.sharedData.getMap('cache.level2')
+
+// declare the TTL in milliseconds
+def TTL = 30 * 1000
+
+// declare the port of the server
+def port = 8090
+
+// write a response to the request with chunk disable and Content-Length header
+def response = { req, value ->
+    req.response.chunked = false
+    req.response.headers["Content-Length"] = value.length()
+    req.response.end(value)
+}
+
 // implement the put handler ('http://localhost:8080/key/value')
-routeMatcher.put("/:key/:value/") { req ->
-    println "put ${req.params.key}=${req.params.value}"
+routeMatcher.get("/:key/:value/") { req ->
+    // send an "update" action to the collection "cache" with attributes "key" and "value" from request parameters
+    def key = req.params.key
+    def value = req.params.value
+    def thread = Thread.currentThread().name
+    def msg = [
+            action: "save",
+            collection: "cache",
+            document: [
+                    _id: key,
+                    value: value,
+                    date: new Date(),
+                    port: port,
+                    thread: thread
+            ]
+    ]
 
-    // retrieve the payload of the request
-    def body = new Buffer(0)
-    req.dataHandler { buffer -> body << buffer }
+    // add to shared map
+    cacheL2[key] = Json.encode(msg.document)
 
-    req.endHandler {
-        // send an "update" action to the collection "cache" with attributes "key" and "value" from request parameters
-        def msg = [
-                action: "save",
-                collection: "cache",
-                document: [
-                        key: req.params.key,
-                        value: req.params.value
-                ]
-        ]
+    // add a timer for removing this element after the TTL
+    vertx.setTimer(TTL) { cacheL2.remove(key)}
 
-        evtBus.send("xke:cache", msg) { message ->
-            println "snd=${message.body}"
-        }
+    evtBus.send("xke.cache", msg) { message ->
+        def status = (message.body.status ?: "nok")
+        logger.info "[$thread] put=$status"
+
+        // write the response
+        req.response.chunked = false
+        req.response.headers["Content-Length"] = "ok".length()
+        req.response.end("ok")
     }
-    req.response.end("ok")
+
 }
 
 // implement the get handler ('http://localhost:8080/key/')
 routeMatcher.get("/:key/") { req ->
-    println "get ${req.params.key}"
+    def key = req.params.key
+    def thread = Thread.currentThread().name
 
+    // check that the value is in cache
+    if (cacheL2.containsKey(key)) {
+        def valueEncoded = cacheL2.get(key)
+        def value = Json.decodeValue(valueEncoded, LinkedHashMap.class)
+        logger.info "[${thread}][level2][${thread.equals(value.thread)}][key=$key][value=$value]"
+
+        response(req, valueEncoded)
+    } else {
         // send a "find" action from the collection "cache" with attribute "key"
-        evtBus.send("xke:cache", [action: "find", collection: "cache", matcher: [key: req.params.key]]) { message ->
-            println "rcv=${message.body}"
-            def value = message.body.results[0].value
+        evtBus.send("xke.cache", [action: "find", collection: "cache", matcher: [_id: key]]) { message ->
+            logger.info "[$thread][level1][key=$key][value=${message.body}]"
+
+            def value = ""
+            message.body.results.each { result ->
+                value = "$value $result \n"
+            }
 
             // write the found message to http response
-            req.response.headers["Content-Length"] = value.length()
-            req.response.end(value)
+            response(req, value)
         }
+    }
 }
 
 routeMatcher.noMatch { req ->
-    println "no match ${req.params} ${req.method} ${req.path}"
+    req.response.end("no match to path '${req.path}' with parameters '${req.params}' and method '${req.method}' .")
 }
 
-// start the http to 8080
-println "start server"
-vertx.createHttpServer().requestHandler(routeMatcher.asClosure()).listen(8090, "localhost")
+// start the http to the declared port
+logger.info "start server"
+vertx.createHttpServer().requestHandler(routeMatcher.asClosure()).listen(port, "localhost")
