@@ -1,5 +1,7 @@
 import org.vertx.groovy.core.http.RouteMatcher
 import org.vertx.java.core.json.impl.Json
+import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.AtomicLong
 
 // configure mongo (default port is 27017) to address "xke:cache" and base "xke"
 def mongoConf = [
@@ -27,10 +29,13 @@ def evtBus = vertx.eventBus
 def cacheL2 = vertx.sharedData.getMap('cache.level2')
 
 // declare the TTL in milliseconds
-def TTL = 30 * 1000
+int TTL = 30 * 1000
 
 // declare the port of the server
-def port = 8090
+int port = 8090
+
+// declare the hit counter (AtomicLong)
+AtomicLong hits = new AtomicLong(0)
 
 // write a response to the request with chunk disable and Content-Length header
 def response = { req, value ->
@@ -45,13 +50,14 @@ routeMatcher.get("/:key/:value/") { req ->
     def key = req.params.key
     def value = req.params.value
     def thread = Thread.currentThread().name
+
     def msg = [
             action: "save",
             collection: "cache",
             document: [
                     _id: key,
                     value: value,
-                    date: new Date(),
+                    date: "{\$date: \"${new Date().format("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")}\"}",
                     port: port,
                     thread: thread
             ]
@@ -67,10 +73,14 @@ routeMatcher.get("/:key/:value/") { req ->
         def status = (message.body.status ?: "nok")
         logger.info "[$thread] put=$status"
 
+        // send the stats
+        vertx.eventBus.send("mongostat.hit",[hit:hits.incrementAndGet()])
+
         // write the response
         req.response.chunked = false
         req.response.headers["Content-Length"] = "ok".length()
         req.response.end("ok")
+
     }
 
 }

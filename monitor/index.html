@@ -3,99 +3,36 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Highcharts Example</title>
+    <title>Cache stats</title>
 
-    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+    <script type="text/javascript" src="/js/jquery-1.8.2.min.js"></script>
+    <script type="text/javascript" src="/js/highcharts.js"></script>
+    <!-- contains the main chart for xebia counter -->
+    <script type="text/javascript" src="/js/xebia-highcharts.js"></script>
+    <script type="text/javascript" src="/js/sockjs-0.2.1.min.js"></script>
+    <script type="text/javascript" src='/js/vertxbus.js'></script>
+
     <script type="text/javascript">
-        $(function () {
-        var chart;
-        $(document).ready(function() {
-        chart = new Highcharts.Chart({
-        chart: {
-        renderTo: 'container',
-        type: 'bar'
-        },
-        title: {
-        text: 'Historic World Population by Region'
-        },
-        subtitle: {
-        text: 'Source: Wikipedia.org'
-        },
-        xAxis: {
-        categories: ['Africa', 'America', 'Asia', 'Europe', 'Oceania'],
-        title: {
-        text: null
-        }
-        },
-        yAxis: {
-        min: 0,
-        title: {
-        text: 'Population (millions)',
-        align: 'high'
-        },
-        labels: {
-        overflow: 'justify'
-        }
-        },
-        tooltip: {
-        formatter: function() {
-        return ''+
-        this.series.name +': '+ this.y +' millions';
-        }
-        },
-        plotOptions: {
-        bar: {
-        dataLabels: {
-        enabled: true
-        }
-        }
-        },
-        legend: {
-        layout: 'vertical',
-        align: 'right',
-        verticalAlign: 'top',
-        x: -100,
-        y: 100,
-        floating: true,
-        borderWidth: 1,
-        backgroundColor: '#FFFFFF',
-        shadow: true
-        },
-        credits: {
-        enabled: false
-        },
-        series: [{
-        name: 'Year 1800',
-        data: [107, 31, 635, 203, 2]
-        }, {
-        name: 'Year 1900',
-        data: [133, 156, 947, 408, 6]
-        }, {
-        name: 'Year 2008',
-        data: [973, 914, 4054, 732, 34]
-        }]
-        });
-        });
 
-        });
-    </script>
+        var hits=0;
+        var eb = new vertx.EventBus(window.location.protocol + '//' + window.location.hostname + ':' + window.location.port + '/monitor-evt-bus');
 
-    <script src="http://cdn.sockjs.org/sockjs-0.2.1.min.js"></script>
-    <script src='js/vertxbus.js'></script>
-
-    <script>
-
-        var eb = new vertx.EventBus('http://localhost:8095/monitor-evt-bus/');
+        eb.onclose = function() {console.log('event bus closed')}
 
         eb.onopen = function() {
+            console.log('event bus opened');
+            eb.registerHandler('mongostat.count', function(message) {
+                console.log('received count: ' + JSON.stringify(message.count));
+                var x=(new Date()).getTime(),
+                    y=message.count;
+                console.log('add point '+x+','+y);
+                countChart.series[0].addPoint([x,y], true, true);
+            });
 
-        eb.registerHandler('mongostat', function(message) {
-        console.log('received a message: ' + JSON.stringify(message));
-
-        });
-
-        eb.send('mongostat', {text : "salut"})
-
+            eb.registerHandler('mongostat.hit', function(message) {
+                console.log('received hit: ' + JSON.stringify(message.hit));
+                $('#hitsContainer').text(hits++);
+            });
         }
 
     </script>
@@ -103,9 +40,7 @@
 </head>
 <body>
 
-<div id="container" style="min-width: 400px; height: 400px; margin: 0 auto"></div>
-
-<script type="text/javascript" src="http://localhost:8095/js/highcharts.js"></script>
-<script type="text/javascript" src="http://localhost:8095/js/exporting.js"></script>
+<div id="countContainer" style="width: 400px; height: 300px; margin: 0 auto"></div>
+hits: <div id="hitsContainer" style="width: 400px; height: 300px; margin: 0 auto"></div>
 </body>
 </html>
