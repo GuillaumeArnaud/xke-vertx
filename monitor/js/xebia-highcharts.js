@@ -35,6 +35,11 @@
         color: '#808080'
         }]
         },
+        plotOptions: {
+            spline: {
+                marker: {enabled: false}
+            }
+        },
         tooltip: {
         formatter: function() {
         return '<b>'+ this.series.name +'</b><br/>'+
@@ -53,15 +58,7 @@
         data: (function() {
         // generate an array of random data
         var data = [],
-        time = (new Date()).getTime(),
-        i;
-
-        for (i = -19; i <= 0; i++) {
-        data.push({
-        x: time + i * 1000,
-        y: 0
-        });
-        }
+        time = (new Date()).getTime();
         return data;
         })()
         }]

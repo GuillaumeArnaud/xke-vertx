@@ -35,7 +35,8 @@ int TTL = 30 * 1000
 int port = 8090
 
 // declare the hit counter (AtomicLong)
-AtomicLong hits = new AtomicLong(0)
+AtomicLong hitsL1 = new AtomicLong(0)
+AtomicLong hitsL2 = new AtomicLong(0)
 
 // write a response to the request with chunk disable and Content-Length header
 def response = { req, value ->
@@ -57,7 +58,7 @@ routeMatcher.get("/:key/:value/") { req ->
             document: [
                     _id: key,
                     value: value,
-                    date: "{\$date: \"${new Date().format("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")}\"}",
+                    date: System.currentTimeMillis(),
                     port: port,
                     thread: thread
             ]
@@ -72,9 +73,6 @@ routeMatcher.get("/:key/:value/") { req ->
     evtBus.send("xke.cache", msg) { message ->
         def status = (message.body.status ?: "nok")
         logger.info "[$thread] put=$status"
-
-        // send the stats
-        vertx.eventBus.send("mongostat.hit",[hit:hits.incrementAndGet()])
 
         // write the response
         req.response.chunked = false
@@ -96,11 +94,17 @@ routeMatcher.get("/:key/") { req ->
         def value = Json.decodeValue(valueEncoded, LinkedHashMap.class)
         logger.info "[${thread}][level2][${thread.equals(value.thread)}][key=$key][value=$value]"
 
+        // send the stats to 'mongostat.l2.hit'
+        vertx.eventBus.send("mongostat.l2.hit",[hit:hitsL2.incrementAndGet()])
+
         response(req, valueEncoded)
     } else {
         // send a "find" action from the collection "cache" with attribute "key"
         evtBus.send("xke.cache", [action: "find", collection: "cache", matcher: [_id: key]]) { message ->
             logger.info "[$thread][level1][key=$key][value=${message.body}]"
+
+            // send the stats to 'mongostat.l1.hit'
+            vertx.eventBus.send("mongostat.l1.hit",[hit:hitsL1.incrementAndGet()])
 
             def value = ""
             message.body.results.each { result ->
@@ -116,6 +120,25 @@ routeMatcher.get("/:key/") { req ->
 routeMatcher.noMatch { req ->
     req.response.end("no match to path '${req.path}' with parameters '${req.params}' and method '${req.method}' .")
 }
+
+// return the current hit count for l1 ('mongostat.l1.hit')
+vertx.eventBus.registerHandler("mongostat.l1.hit") { message ->
+    message.reply([hit:hitsL1.get()])
+}
+
+// return the current hit count for l2 ('mongostat.l2.hit')
+vertx.eventBus.registerHandler("mongostat.l2.hit") { message ->
+    message.reply([hit:hitsL2.get()])
+}
+
+// remove elements which are too old
+vertx.setPeriodic(2000, {
+    evtBus.send("xke.cache", [action: "delete",
+                            collection: "cache",
+                            matcher: [date: ["\$lte": System.currentTimeMillis() - 30 * 1000]]]) {
+        logger.debug "remove ${it.body.number} elements"
+    }
+})
 
 // start the http to the declared port
 logger.info "start server"

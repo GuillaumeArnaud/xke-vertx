@@ -45,6 +45,5 @@ vertx.setPeriodic(2000, {
     })
 })
 
-
 // start the http server
 server.listen(8095, "localhost")

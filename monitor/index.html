@@ -15,23 +15,51 @@
     <script type="text/javascript">
 
         var hits=0;
-        var eb = new vertx.EventBus(window.location.protocol + '//' + window.location.hostname + ':' + window.location.port + '/monitor-evt-bus');
+        var evtBus = new vertx.EventBus(window.location.protocol + '//' + window.location.hostname + ':' + window.location.port + '/monitor-evt-bus');
 
-        eb.onclose = function() {console.log('event bus closed')}
 
-        eb.onopen = function() {
+
+
+        evtBus.onclose = function() {console.log('event bus closed')}
+
+        evtBus.onopen = function() {
             console.log('event bus opened');
-            eb.registerHandler('mongostat.count', function(message) {
-                console.log('received count: ' + JSON.stringify(message.count));
+
+
+            // initialize the chart (the 20th first points)
+            time = (new Date()).getTime();
+            countChart.series[0].data=[]
+            evtBus.send('xke.cache.monitor', {action: 'count', collection: 'cache'}, function(message) {
+                for (i = -19; i <= 0; i++) {
+                    countChart.series[0].addPoint({
+                        x: time + i * 2000,
+                        y: message["count"]
+                        });
+                }
+            });
+
+            // register handler for get
+            evtBus.registerHandler('mongostat.count', function(message) {
                 var x=(new Date()).getTime(),
                     y=message.count;
-                console.log('add point '+x+','+y);
                 countChart.series[0].addPoint([x,y], true, true);
             });
 
-            eb.registerHandler('mongostat.hit', function(message) {
-                console.log('received hit: ' + JSON.stringify(message.hit));
-                $('#hitsContainer').text(hits++);
+            // request the hit count on 'mongostat.l1.hit' topic
+            evtBus.send('mongostat.l1.hit',{}, function(message) {
+               $('#hitsContainerL1').text(message.hit);
+            });
+
+            // request the hit count on 'mongostat.l2.hit' topic
+            evtBus.send('mongostat.l2.hit',{}, function(message) {
+                $('#hitsContainerL2').text(message.hit);
+            });
+
+            evtBus.registerHandler('mongostat.l1.hit', function(message) {
+                $('#hitsContainerL1').text(message.hit);
+            });
+            evtBus.registerHandler('mongostat.l2.hit', function(message) {
+                $('#hitsContainerL2').text(message.hit);
             });
         }
 
@@ -40,7 +68,8 @@
 </head>
 <body>
 
-<div id="countContainer" style="width: 400px; height: 300px; margin: 0 auto"></div>
-hits: <div id="hitsContainer" style="width: 400px; height: 300px; margin: 0 auto"></div>
+<div id="countContainer" style="width: 800px; height: 300px; margin: 0 auto"></div>
+<div style="font-size: 24px; font-family: Courier New; font-weight: bold;width: 600px; margin: 0 ;">hits level1: <span id="hitsContainerL1"></span></div>
+<div style="font-size: 24px; font-family: Courier New; font-weight: bold;width: 600px; margin: 0 ;">hits level2: <span id="hitsContainerL2"></span></div>
 </body>
 </html>
