@@ -17,19 +17,15 @@
         var hits=0;
         var evtBus = new vertx.EventBus(window.location.protocol + '//' + window.location.hostname + ':' + window.location.port + '/monitor-evt-bus');
 
-
-
-
         evtBus.onclose = function() {console.log('event bus closed')}
 
         evtBus.onopen = function() {
             console.log('event bus opened');
 
-
             // initialize the chart (the 20th first points)
             time = (new Date()).getTime();
             countChart.series[0].data=[]
-            evtBus.send('xke.cache.monitor', {action: 'count', collection: 'cache'}, function(message) {
+            evtBus.send('xke.cache', {action: 'count', collection: 'cache'}, function(message) {
                 for (i = -19; i <= 0; i++) {
                     countChart.series[0].addPoint({
                         x: time + i * 2000,

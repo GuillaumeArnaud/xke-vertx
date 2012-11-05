@@ -3,24 +3,10 @@ import org.vertx.java.core.json.impl.Json
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
 
-// configure mongo (default port is 27017) to address "xke:cache" and base "xke"
-def mongoConf = [
-        "address": "xke.cache",
-        "host": "localhost",
-        "port": 27017,
-        "db_name": "xke"
-]
-
 def routeMatcher = new RouteMatcher()
 
 // declare the logger vertx
 def logger = container.logger
-
-// declare the mongo persistor mods. That will download the module at the first start and will create a 'mods' directory
-// to the working directory.
-container.with {
-    deployModule('vertx.mongo-persistor-v1.0', mongoConf, 1)
-}
 
 // declare the event bus
 def evtBus = vertx.eventBus
@@ -28,8 +14,9 @@ def evtBus = vertx.eventBus
 // declare the share map
 def cacheL2 = vertx.sharedData.getMap('cache.level2')
 
-// declare the TTL in milliseconds
-int TTL = 30 * 1000
+// declare the TTL_L1 and TTL_L2 in milliseconds
+int TTL_L1 = 30 * 1000
+int TTL_L2 = 3 * 1000
 
 // declare the port of the server
 int port = 8090
@@ -45,13 +32,18 @@ def response = { req, value ->
     req.response.end(value)
 }
 
-// implement the put handler ('http://localhost:8080/key/value')
+// implement the get handler ('http://localhost:8080/key/value')
 routeMatcher.get("/:key/:value/") { req ->
     // send an "update" action to the collection "cache" with attributes "key" and "value" from request parameters
     def key = req.params.key
     def value = req.params.value
     def thread = Thread.currentThread().name
+    def hostName = InetAddress.getLocalHost().getHostName()
 
+    // add a timer for removing this element after the TTL divides per 10
+    vertx.setTimer((TTL_L2)) { cacheL2.remove(key)}
+
+    // build the save message for mongo-persistor
     def msg = [
             action: "save",
             collection: "cache",
@@ -60,25 +52,26 @@ routeMatcher.get("/:key/:value/") { req ->
                     value: value,
                     date: System.currentTimeMillis(),
                     port: port,
-                    thread: thread
+                    thread: thread,
+                    hostname: hostName
             ]
     ]
 
     // add to shared map
     cacheL2[key] = Json.encode(msg.document)
 
-    // add a timer for removing this element after the TTL
-    vertx.setTimer(TTL) { cacheL2.remove(key)}
-
     evtBus.send("xke.cache", msg) { message ->
         def status = (message.body.status ?: "nok")
         logger.info "[$thread] put=$status"
 
+        if (message.body.status) {
+            evtBus.send("replica", msg)
+        }
+
         // write the response
         req.response.chunked = false
-        req.response.headers["Content-Length"] = "ok".length()
-        req.response.end("ok")
-
+        req.response.headers["Content-Length"] = status.length()
+        req.response.end(status)
     }
 
 }
@@ -95,7 +88,7 @@ routeMatcher.get("/:key/") { req ->
         logger.info "[${thread}][level2][${thread.equals(value.thread)}][key=$key][value=$value]"
 
         // send the stats to 'mongostat.l2.hit'
-        vertx.eventBus.send("mongostat.l2.hit",[hit:hitsL2.incrementAndGet()])
+        vertx.eventBus.send("mongostat.l2.hit", [hit: hitsL2.incrementAndGet()])
 
         response(req, valueEncoded)
     } else {
@@ -103,12 +96,14 @@ routeMatcher.get("/:key/") { req ->
         evtBus.send("xke.cache", [action: "find", collection: "cache", matcher: [_id: key]]) { message ->
             logger.info "[$thread][level1][key=$key][value=${message.body}]"
 
-            // send the stats to 'mongostat.l1.hit'
-            vertx.eventBus.send("mongostat.l1.hit",[hit:hitsL1.incrementAndGet()])
+            if(message.body.results.size() > 0) {
+                // send the stats to 'mongostat.l1.hit'
+                vertx.eventBus.send("mongostat.l1.hit", [hit: hitsL1.incrementAndGet()])
+            }
 
             def value = ""
             message.body.results.each { result ->
-                value = "$value $result \n"
+                value = Json.encode(result)
             }
 
             // write the found message to http response
@@ -123,19 +118,19 @@ routeMatcher.noMatch { req ->
 
 // return the current hit count for l1 ('mongostat.l1.hit')
 vertx.eventBus.registerHandler("mongostat.l1.hit") { message ->
-    message.reply([hit:hitsL1.get()])
+    message.reply([hit: hitsL1.get()])
 }
 
 // return the current hit count for l2 ('mongostat.l2.hit')
 vertx.eventBus.registerHandler("mongostat.l2.hit") { message ->
-    message.reply([hit:hitsL2.get()])
+    message.reply([hit: hitsL2.get()])
 }
 
-// remove elements which are too old
-vertx.setPeriodic(2000, {
+// remove periodically elements which are too old in mongo cache
+vertx.setPeriodic(1000, {
     evtBus.send("xke.cache", [action: "delete",
-                            collection: "cache",
-                            matcher: [date: ["\$lte": System.currentTimeMillis() - 30 * 1000]]]) {
+            collection: "cache",
+            matcher: [date: ["\$lte": System.currentTimeMillis() - TTL_L1]]]) {
         logger.debug "remove ${it.body.number} elements"
     }
 })

@@ -1,0 +1,4 @@
+{
+    "main": "replicator.groovy",
+    "worker": false
+}
