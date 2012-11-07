@@ -1,4 +1,158 @@
 <html>
-    <h3>Exercice 5</h3>
+<h3>Exercice 1</h3>
+Le but est de créer un serveur http à l'aide du routeMatcher.
+<ul>
+    <li>ouvrir le fichier cache/cache.groovy</li>
+    <li>démarrer un serveur http sur le port 8090</li>
+    <li>ajouter un route matcher qui route l'url http://localhost:8090/#key#/ et retournera la #key# (#key# sera une
+        string arbitraire).
+    </li>
+    <li>ouvrir le fichier start.groovy. Deployer le verticle cache/cache/groovy</li>
+    <li>à la racine du projet, lancer la commande: vertx run start.groovy</li>
+</ul>
+
+<b>résultat:</b> taper http://localhost:8090/toto/ sur votre navigateur, la page doit afficher toto.
+
+<b>optionel:</b> ajouter un routage pour récupérer toutes les urls ne matchant pas le path /#key#/.
+
+<h3>Exercice 2</h3>
+
+Le but est d'insérer et de récupérer des documents mongo via le serveur http.
+
+<ul>
+    <li>deployer le module vertx.mongo-persistor dans start.groovy à l'aide de la configuration mongoConf présent dans
+        le fichier.
+    </li>
+    <li>ajouter un routage sur l'url http://localhost:8090/#key#/#value#/</li>
+    <li>dans ce handler, il faut créer un document qui aura pour _id mongo la clé #key# et pour champ value #value#</li>
+    <li>envoyer le message correspondant sur le bus mongo définit à l'adresse xke.cache afin de le persister</li>
+    <li>dans le routage http://localhost:8090/#key#/, ajouter le handler qui retourne la valeur en fonction de la clé
+    </li>
+    <li>à la racine du projet, lancer la commande: vertx run start.groovy</li>
+</ul>
+
+<b>résultat:</b> taper http://localhost:8090/toto/tata/ sur votre navigateur. Vérifier qu'un document avec l'id toto
+contient bien la valeur tata à l'aide du shell mongo.
+
+<h3>Exercice 3</h3>
+
+Le but est de créer un injecteur pour le serveur http précédent.
+
+<ul>
+    <li>dans le fichier injector/injector.groovy, ajouter les requêtes pour insérer et récupérer les clés/valeurs</li>
+    <li>dans le répertoire injector, lancer la commande: vertx run injector.groovy</li>
+</ul>
+
+<b>résultat:</b> faites tourner l'injection quelques secondes et vérifier qu'on a bien les valeurs attendues.
+
+<b>optionel:</b> remplacer le setPeriodic par une itération (par ex. 100.times{...}) et remplacer le setTimer par un
+sleep. Lancer le test et observer.
+
+<h3>Exercice 4</h3>
+
+Le but est de tester le mode multi-instance.
+
+<ul>
+    <li>ajouter dans le put et le get du cache, un log affichant le nom du thread.</li>
+    <li>à la racine, lancer la commande: vertx run start.groovy -instances 2</li>
+    <li>lancer l'injection</li>
+</ul>
+
+<b>résultat:</b> vérifier qu'on a bien deux threads différents qui font le put et le get.
+
+<h3>Exercice 7</h3>
+
+Le but est de faire un cache de niveau 2 (L2) à l'aide du shared map de vertx.
+
+<ul>
+    <li>ajouter une map partagée à l'aide vertx.sharedData</li>
+    <li>dans le handler qui insére la donnée, insérer aussi le document dans le cache L2</li>
+    <li>ajouter également dans ce handler un timer qui supprimera l'élément du cache L2 au bout d'un temps TTL_L2</li>
+    <li>dans le handler qui récupère la donnée, avant de récupérer la valeur dans mongo, tester si elle existe dans L2
+        et si c'est le cas, retourner la valeur.
+    </li>
+    <li>lancer l'injection</li>
+</ul>
+
+<b>résultat:</b> vérifier que l'injection se passe toujours bien.
+
+<b>conseil:</b> utiliser la classe Json de vertx pour sérialiser le docuement dans la map partagée.
+
+<h3>Exercice 8</h3>
+
+Le but est de tester le mode cluster.
+
+<ul>
+    <li>dans le document mongo, ajouter un champ 'port' qui contiendra le numéro de port http</li>
+    <li>lancer l'instance: vertx run start.groovy -cluster</li>
+    <li>changer le port d'écoute http</li>
+    <li>lancer l'instance: vertx run start.groovy -cluster -cluster-port 1234</li>
+    <li>lancer l'injection (en restant sur le port 8090)</li>
+</ul>
+
+<b>résultat:</b> dans le shell mongo, vérifier que certains documents contiennent le port du deuxième noeud. A l'aide
+des logs, vérifier que sur le deuxième noeud on récupère bien des valeurs du cache L2 (la map est partagée sur les
+différents noeuds).
+
+<b>optionel:</b> on peut faire le même test en lançant plusieurs instances verticle et vérifier que la map est bien
+partagée sur plusieurs instances aussi.
+
+<h3>Exercice 9</h3>
+
+Le but est d'ajouter une page de monitoring du cache alimentée par une websocket.
+
+<ul>
+    <li>dans le fichier monitor/monitor.groovy, configurer un serveur SockJS ainsi qu'un bridge sur /monitor-evt-bus
+    </li>
+    <li>périodiquement envoyer d'éléments dans mongo sur le bus d'évènement mongostat.count</li>
+    <li>dans le fichier monitor/index.html, ajouter un handler qui écoute sur le bus d'évènement mongostat.count et
+        aliment le
+        graphique Highchart
+    </li>
+    <li>ajouter le verticle monitor/monitor.groovy dans le container</li>
+    <li>lancer l'application</li>
+</ul>
+
+<b>résultat:</b> sur l'url http://localhost:8095 on devrait un graphe, mis à jour toutes les 2s et avec les valeurs
+envoyées.
+
+<h3>Exercice 10</h3>
+
+Le but est que la page de monitoring (js) interroge directement les noeuds du cache pour récupérer le nombre de hit L1
+et L2.
+
+<ul>
+    <li>dans le fichier cache/cache.groovy, incrémenter les compteurs hitsL1 et hitsL2</li>
+    <li>ajouter deux handlers sur l'event bus aux adresses "mongostat.l1.hit" et "mongostat.l2.hit" qui feront un reply
+        du message avec la valeur de compteur.
+    </li>
+    <li>dans le fichier monitor/index.html, à l'aide d'envoi sur l'event bus aux adresses précédentes, récupérer les
+        valeurs de hits et afficher ces valeurs dans la page
+    </li>
+    <li>lancer et l'application puis l'injection</li>
+</ul>
+
+<b>résultat:</b> les compteurs doivent s'incrémenter dans l'url.
+
+
+<h3>Exercice 11</h3>
+Le but est de l'exercice est de créer un <i>mod</i> qui s'occupe d'envoyer les insertions mongo d'un verticle à un autre
+grâce à une connexion tcp.
+
+Vous trouverez des infos <a href="http://vertx.io/mods_manual.html">ici</a>.
+
+<ul>
+    <li>remplir le fichier mods/mod-replica/mod.json</li>
+    <li>ajouter la réplication dans le script mods/mod-replica/replicator.groovy</li>
+    <li>dans le fichier cache/cache.groovy, lorsque l'insertion dans mongo a été validée, ajouter un envoi du document
+        sur le bus d'événement à l'adresse replica
+    </li>
+    <li>lancer deux instances, l'une en tant que serveur et l'autre en tant que client (cf. replicaConf dans
+        start.groovy). Les deux instances doivent avoir des ports http différents et un nom de base mongo différent.
+    </li>
+    <li>lancer l'injection sur l'une des deux instances</li>
+</ul>
+
+<b>résultat:</b> vérifier à l'aide de mongoshell que les deux bases sont bien alimentées.
 
 </html>
