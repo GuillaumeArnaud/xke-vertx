@@ -11,7 +11,7 @@ def logger = container.logger
 // declare the event bus
 def evtBus = vertx.eventBus
 
-// declare the share map
+// TODO declare the share map 'cache.leve2'
 def cacheL2 = vertx.sharedData.getMap('cache.level2')
 
 // declare the TTL_L1 and TTL_L2 in milliseconds
@@ -32,7 +32,7 @@ def response = { req, value ->
     req.response.end(value)
 }
 
-// implement the get handler ('http://localhost:8080/key/value')
+// implement the get handler ('http://localhost:8080/key/value/')
 routeMatcher.get("/:key/:value/") { req ->
     // send an "update" action to the collection "cache" with attributes "key" and "value" from request parameters
     def key = req.params.key
@@ -41,7 +41,7 @@ routeMatcher.get("/:key/:value/") { req ->
     def hostName = InetAddress.getLocalHost().getHostName()
 
     // add a timer for removing this element after the TTL divides per 10
-    vertx.setTimer((TTL_L2)) { cacheL2.remove(key)}
+    vertx.setTimer(TTL_L2) { cacheL2.remove(key)}
 
     // build the save message for mongo-persistor
     def msg = [
@@ -64,7 +64,7 @@ routeMatcher.get("/:key/:value/") { req ->
         def status = (message.body.status ?: "nok")
         logger.info "[$thread] put=$status"
 
-        if (message.body.status) {
+        if (message.body.status.equals("ok")) {
             evtBus.send("replica", msg)
         }
 

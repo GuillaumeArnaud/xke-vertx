@@ -1,4 +1,1 @@
-{
-    "main": "replicator.groovy",
-    "worker": false
-}
+// TODO configure the mod to replicator.groovy

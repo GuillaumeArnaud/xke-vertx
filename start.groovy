@@ -13,9 +13,7 @@ def replicaConf = [
         "server": false
 ]
 
-
-// declare the mongo persistor mods. That will download the module at the first start and will create a 'mods' directory
-// to the working directory.
+// add the verticles and modules to the container
 container.with {
     deployModule('vertx.mongo-persistor', mongoConf, 1)
     deployVerticle("cache/cache.groovy")
