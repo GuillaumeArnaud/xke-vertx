@@ -13,10 +13,6 @@ def replicaConf = [
         "server": false
 ]
 
-// add the verticles and modules to the container
 container.with {
-    deployModule('vertx.mongo-persistor', mongoConf, 1)
-    deployVerticle("cache/cache.groovy")
-    deployVerticle("monitor/monitor.groovy")
-    deployModule('mod-replica', replicaConf)
+    // TODO add the verticles and modules to the container
 }
