@@ -16,16 +16,31 @@
 
         var hits=0;
         <!-- TODO create the event bus -->
-        <!-- var evtBus = -->
+        var evtBus = new vertx.EventBus(window.location.protocol + '//' + window.location.hostname + ':' + window.location.port + '/monitor-evt-bus');
 
         evtBus.onclose = function() {console.log('event bus closed')}
 
         evtBus.onopen = function() {
             console.log('event bus opened');
 
-            // TODO register event bus handler on address 'mongostat.count' for adding new point to the graph 'countChart'
+            // initialize the chart (the 20th first points)
+            time = (new Date()).getTime();
+            countChart.series[0].data=[]
+            evtBus.send('xke.cache', {action: 'count', collection: 'cache'}, function(message) {
+                for (i = -19; i <= 0; i++) {
+                    countChart.series[0].addPoint({
+                        x: time + i * 2000,
+                        y: message["count"]
+                        });
+                }
+            });
 
-            // TODO request the hit count on 'mongostat.l1.hit' topic and add the count in hitsContainerL1 element
+            // register handler for get
+            evtBus.registerHandler('mongostat.count', function(message) {
+                var x=(new Date()).getTime(),
+                    y=message.count;
+                countChart.series[0].addPoint([x,y], true, true);
+            });
 
             // TODO request the hit count on 'mongostat.l2.hit' topic and add the count in hitsContainerL2 element
 
