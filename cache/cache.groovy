@@ -57,6 +57,9 @@ routeMatcher.get("/:key/:value/") { req ->
             ]
     ]
 
+    // add to shared map
+    cacheL2[key] = Json.encode(msg.document)
+
     evtBus.send("xke.cache", msg) { message ->
         def status = (message.body.status ?: "nok")
         logger.info "[$thread] put=$status"
@@ -74,12 +77,34 @@ routeMatcher.get("/:key/") { req ->
     def key = req.params.key
     def thread = Thread.currentThread().name
 
-    // send a "find" action from the collection "cache" with attribute "key"
-    evtBus.send("xke.cache", [action: "find", collection: "cache", matcher: [_id: key]]) { message ->
-        logger.info "[$thread][level1][key=$key][value=${message.body}]"
+    // check that the value is in cache
+    if (cacheL2.containsKey(key)) {
+        def valueEncoded = cacheL2.get(key)
+        def value = Json.decodeValue(valueEncoded, LinkedHashMap.class)
+        logger.info "[${thread}][level2][${thread.equals(value.thread)}][key=$key][value=$value]"
 
-        // write the found message to http response
-        response(req, results[0])
+        // send the stats to 'mongostat.l2.hit'
+        vertx.eventBus.send("mongostat.l2.hit", [hit: hitsL2.incrementAndGet()])
+
+        response(req, valueEncoded)
+    } else {
+        // send a "find" action from the collection "cache" with attribute "key"
+        evtBus.send("xke.cache", [action: "find", collection: "cache", matcher: [_id: key]]) { message ->
+            logger.info "[$thread][level1][key=$key][value=${message.body}]"
+
+            if(message.body.results.size() > 0) {
+                // send the stats to 'mongostat.l1.hit'
+                vertx.eventBus.send("mongostat.l1.hit", [hit: hitsL1.incrementAndGet()])
+            }
+
+            def value = ""
+            message.body.results.each { result ->
+                value = Json.encode(result)
+            }
+
+            // write the found message to http response
+            response(req, value)
+        }
     }
 }
 
