@@ -139,6 +139,7 @@
 
     <p><b>optionel:</b> remplacer le <span id="code">setPeriodic</span> par une itération (par ex. <span id="code">100.times{...}</span>) et remplacer le <span id="code">setTimer</span> par un
     sleep. Lancer le test et observer.</p>
+    <p><b>solution:</b> <span id="code">git checkout -b exercice3 origin/exercice3</span></p>
 </div>
 <div id="exo">
     <h3>Exercice 4</h3>
@@ -193,6 +194,9 @@
 
     <p><b>optionel:</b> on peut faire le même test en lançant plusieurs instances verticle et vérifier que la map est bien
     partagée sur plusieurs instances aussi.</p>
+
+    <p><b>solution:</b> <span id="code">git checkout -b exercice6 origin/exercice6</span></p>
+
 </div>
 <div id="exo">
 
@@ -205,8 +209,7 @@
         <li>configurer un serveur SockJS ainsi qu'un bridge sur <span id="code">/monitor-evt-bus</span></li>
         <li>périodiquement envoyer des éléments dans mongo sur le bus d'évènement <span id="code">mongostat.count</span></li>
         <li>dans le fichier <span id="code">monitor/index.html</span>, ajouter un handler qui écoute sur le bus d'évènement <span id="code">mongostat.count</span> et
-            aliment le
-            graphique <a href="http://www.highcharts.com/">Highchart</a>
+            alimente le graphique <a href="http://www.highcharts.com/">Highchart</a> qui se nomme <span id="code">countChart</span>
         </li>
         <li>ajouter le verticle <span id="code">monitor/monitor.groovy</span> dans le container</li>
         <li>lancer l'application</li>
@@ -215,6 +218,9 @@
     <p><b>résultat:</b> sur l'url <a href="http://localhost:8095/">http://localhost:8095/</a> on devrait un graphe, mis à jour toutes les 2s et avec les valeurs
     envoyées.</p>
     <p><b>conseil:</b> pour charger le fichier html utiliser <span id="code">sendFile</span>.</p>
+    <p><b>conseil:</b> pour ajouter un point sur un graphique Highchart:
+        <span id="code">countChart.series[0].addPoint([x,y], true, true);</span> où <span id="code">x</span> est la date et <span id="code">y</span> le nombre d'éléments.
+    </p>
 </div>
 <div id="exo">
 
@@ -234,6 +240,9 @@
     </ul>
 
     <p><b>résultat:</b> les compteurs doivent s'incrémenter dans l'url.</p>
+
+    <p><b>solution:</b> <span id="code">git checkout -b exercice8 origin/exercice8</span></p>
+
 </div>
 <div id="exo">
 
@@ -248,6 +257,7 @@
         <li>dans le fichier <span id="code">cache/cache.groovy</span>, lorsque l'insertion dans mongo a été validée, ajouter un envoi du
             document sur le bus d'événement à l'adresse <span id="code">replica</span>
         </li>
+        <li>deployer le nouveau module <span id="code">mod-replica</span> dans <span id="code">start.groovy</span></li>
         <li>lancer deux instances, l'une en tant que serveur et l'autre en tant que client (cf. <span id="code">replicaConf</span> dans
             <span id="code">start.groovy</span>). Les deux instances doivent avoir des ports http différents et un nom de base mongo différent.
         </li>
