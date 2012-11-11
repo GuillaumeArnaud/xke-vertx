@@ -11,7 +11,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/applications/vert.x-1.2.3.final/lib/gmongo-1.0.jar!/" />
+          <root url="jar://$USER_HOME$/applications/vert.x-1.3.0.final/lib/groovy-all-2.0.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -20,7 +20,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/applications/vert.x-1.2.3.final/lib/groovy-all-2.0.0.jar!/" />
+          <root url="jar://$USER_HOME$/applications/vert.x-1.3.0.final/lib/hazelcast-2.1.2.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -29,7 +29,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/applications/vert.x-1.2.3.final/lib/hazelcast-2.1.2.jar!/" />
+          <root url="jar://$USER_HOME$/applications/vert.x-1.3.0.final/lib/jackson-core-asl-1.9.4.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -38,7 +38,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/applications/vert.x-1.2.3.final/lib/jackson-core-asl-1.9.4.jar!/" />
+          <root url="jar://$USER_HOME$/applications/vert.x-1.3.0.final/lib/jackson-mapper-asl-1.9.4.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -47,7 +47,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/applications/vert.x-1.2.3.final/lib/jackson-mapper-asl-1.9.4.jar!/" />
+          <root url="jar://$USER_HOME$/applications/vert.x-1.3.0.final/lib/netty-3.5.8.Final.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -56,7 +56,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/applications/vert.x-1.2.3.final/lib/mongo-java-driver-2.9.0.jar!/" />
+          <root url="jar://$USER_HOME$/applications/vert.x-1.3.0.final/lib/rhino-1.7R4.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -65,7 +65,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/applications/vert.x-1.2.3.final/lib/netty-3.5.0.Final.jar!/" />
+          <root url="jar://$USER_HOME$/applications/vert.x-1.3.0.final/lib/vertx-core-1.3.0.final.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -74,7 +74,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/applications/vert.x-1.2.3.final/lib/rhino-1.7R4.jar!/" />
+          <root url="jar://$USER_HOME$/applications/vert.x-1.3.0.final/lib/vertx-lang-groovy-1.3.0.final.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -83,47 +83,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/applications/vert.x-1.2.3.final/lib/vertx-core-1.2.3.final.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="file://$MODULE_DIR$/../vert.x/vertx-core/src/main/java" />
-          <root url="file://$MODULE_DIR$/../vert.x/vertx-examples/src/main/java" />
-          <root url="file://$MODULE_DIR$/../vert.x/vertx-lang/vertx-lang-java/src/main/java" />
-          <root url="file://$MODULE_DIR$/../vert.x/vertx-lang/vertx-lang-jruby/src/main/java" />
-          <root url="file://$MODULE_DIR$/../vert.x/vertx-lang/vertx-lang-jython/src/main/java" />
-          <root url="file://$MODULE_DIR$/../vert.x/vertx-lang/vertx-lang-rhino/src/main/java" />
-          <root url="file://$MODULE_DIR$/../vert.x/vertx-platform/src/main/java" />
-          <root url="file://$MODULE_DIR$/../vert.x/vertx-testframework/src/main/java" />
-          <root url="file://$MODULE_DIR$/../vert.x/vertx-testsuite/src/test/java" />
-          <root url="file://$MODULE_DIR$/../vert.x/vertx-testsuite/src/test/mod-test/modtestjars" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$USER_HOME$/applications/vert.x-1.2.3.final/lib/vertx-lang-groovy-1.2.3.final.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="file://$MODULE_DIR$/../vert.x/vertx-core/src/main/java" />
-          <root url="file://$MODULE_DIR$/../vert.x/vertx-examples/src/main/java" />
-          <root url="file://$MODULE_DIR$/../vert.x/vertx-lang/vertx-lang-java/src/main/java" />
-          <root url="file://$MODULE_DIR$/../vert.x/vertx-lang/vertx-lang-jruby/src/main/java" />
-          <root url="file://$MODULE_DIR$/../vert.x/vertx-lang/vertx-lang-jython/src/main/java" />
-          <root url="file://$MODULE_DIR$/../vert.x/vertx-lang/vertx-lang-rhino/src/main/java" />
-          <root url="file://$MODULE_DIR$/../vert.x/vertx-platform/src/main/java" />
-          <root url="file://$MODULE_DIR$/../vert.x/vertx-testframework/src/main/java" />
-          <root url="file://$MODULE_DIR$/../vert.x/vertx-testsuite/src/test/java" />
-          <root url="file://$MODULE_DIR$/../vert.x/vertx-testsuite/src/test/mod-test/modtestjars" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$USER_HOME$/applications/vert.x-1.2.3.final/lib/vertx-lang-java-1.2.3.final.jar!/" />
+          <root url="jar://$USER_HOME$/applications/vert.x-1.3.0.final/lib/vertx-lang-java-1.3.0.final.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -132,7 +92,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/applications/vert.x-1.2.3.final/lib/vertx-lang-jruby-1.2.3.final.jar!/" />
+          <root url="jar://$USER_HOME$/applications/vert.x-1.3.0.final/lib/vertx-lang-jruby-1.3.0.final.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -141,7 +101,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/applications/vert.x-1.2.3.final/lib/vertx-lang-jython-1.2.3.final.jar!/" />
+          <root url="jar://$USER_HOME$/applications/vert.x-1.3.0.final/lib/vertx-lang-jython-1.3.0.final.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -150,7 +110,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/applications/vert.x-1.2.3.final/lib/vertx-lang-rhino-1.2.3.final.jar!/" />
+          <root url="jar://$USER_HOME$/applications/vert.x-1.3.0.final/lib/vertx-lang-rhino-1.3.0.final.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -159,28 +119,16 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/applications/vert.x-1.2.3.final/lib/vertx-platform-1.2.3.final.jar!/" />
+          <root url="jar://$USER_HOME$/applications/vert.x-1.3.0.final/lib/vertx-platform-1.3.0.final.jar!/" />
         </CLASSES>
         <JAVADOC />
-        <SOURCES>
-          <root url="file://$MODULE_DIR$/../vert.x/vertx-core/src/main/java" />
-          <root url="file://$MODULE_DIR$/../vert.x/vertx-core/src/main/java" />
-          <root url="file://$MODULE_DIR$/../vert.x/vertx-examples/src/main/java" />
-          <root url="file://$MODULE_DIR$/../vert.x/vertx-lang/vertx-lang-java/src/main/java" />
-          <root url="file://$MODULE_DIR$/../vert.x/vertx-lang/vertx-lang-jruby/src/main/java" />
-          <root url="file://$MODULE_DIR$/../vert.x/vertx-lang/vertx-lang-jython/src/main/java" />
-          <root url="file://$MODULE_DIR$/../vert.x/vertx-lang/vertx-lang-rhino/src/main/java" />
-          <root url="file://$MODULE_DIR$/../vert.x/vertx-platform/src/main/java" />
-          <root url="file://$MODULE_DIR$/../vert.x/vertx-testframework/src/main/java" />
-          <root url="file://$MODULE_DIR$/../vert.x/vertx-testsuite/src/test/java" />
-          <root url="file://$MODULE_DIR$/../vert.x/vertx-testsuite/src/test/mod-test/modtestjars" />
-        </SOURCES>
+        <SOURCES />
       </library>
     </orderEntry>
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/applications/vert.x-1.2.3.final/lib/vertx-testframework-1.2.3.final.jar!/" />
+          <root url="jar://$USER_HOME$/applications/vert.x-1.3.0.final/lib/vertx-testframework-1.3.0.final.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
