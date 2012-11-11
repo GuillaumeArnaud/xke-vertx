@@ -13,8 +13,14 @@ def replicaConf = [
         "server": false
 ]
 
+def logger = container.logger
+
 container.with {
     deployModule('vertx.mongo-persistor', mongoConf, 1)
-    deployVerticle("cache/cache.groovy")
-    deployVerticle("monitor/monitor.groovy")
+    deployVerticle("cache/cache.groovy") {
+        logger.info "cache.groovy verticle deployed"
+    }
+    deployVerticle("monitor/monitor.groovy") {
+        logger.info "monitor.groovy verticle deployed"
+    }
 }

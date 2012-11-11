@@ -1,4 +1,3 @@
-import com.mongodb.util.JSON
 
 def alphabet = (('A'..'Z') + ('0'..'9')).join()
 def randomString = { size ->
@@ -28,9 +27,8 @@ vertx.setPeriodic(2000) {
         client.getNow("/$key/") { respGet ->
             try {
                 // display the body of the response. it should be equal to value
-                respGet.bodyHandler { body ->
-                    def result = JSON.parse(body.toString()).value
-                    if (!result.toString().equals(value)) println "Response ($result) different from value ($value)"
+                respGet.bodyHandler { result ->
+                    if (!result.equals(value)) println "Response ($result) different from value ($value)"
                     else println "get $key=$value"
                 }
                 // close the client connection
