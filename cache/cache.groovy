@@ -18,8 +18,8 @@ def cacheL2 = vertx.sharedData.getMap('cache.level2')
 int TTL_L1 = 30 * 1000
 int TTL_L2 = 3 * 1000
 
-// TODO retrieve the port of the server from configuration defined in 'start.groovy'
-// int port =
+// retrieve the port of the server from configuration defined in 'start.groovy'
+int port = container.config.port
 
 // declare the hit counter (AtomicLong)
 AtomicLong hitsL1 = new AtomicLong(0)
