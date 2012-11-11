@@ -1,4 +1,3 @@
-import com.mongodb.util.JSON
 
 def logger = container.logger
 
@@ -21,19 +20,16 @@ vertx.setPeriodic(2000) {
     def key = randomString(10)
     def value = randomString(20)
 
-    // TODO call a client request on path /#key#/#value#/
     logger.info "put"
     client.getNow("/$key/$value/") { resp ->
         println "put $key=$value"
     }
 
     vertx.setTimer(random.with {random.nextInt(6000)}) {
-        // TODO call a client request on path /#key#/ for getting the precedent value and check that is the expected value
         client.getNow("/$key/") { respGet ->
             try {
                 // display the body of the response. it should be equal to value
-                respGet.bodyHandler { body ->
-                    def result = JSON.parse(body.toString()).value
+                respGet.bodyHandler { result ->
                     if (!result.toString().equals(value)) println "Response ($result) different from value ($value)"
                     else println "get $key=$value"
                 }

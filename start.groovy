@@ -21,7 +21,6 @@ def replicaConf = [
 def logger = container.logger
 
 container.with {
-    // TODO add the verticles and modules to the container
     deployVerticle("cache/cache.groovy", cacheConf, 1) {
         logger.info "verticle cache started"
     }
