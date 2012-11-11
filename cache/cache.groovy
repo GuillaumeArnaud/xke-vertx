@@ -15,8 +15,8 @@ def evtBus = vertx.eventBus
 int TTL_L1 = 30 * 1000
 int TTL_L2 = 3 * 1000
 
-// declare the port of the server
-int port = 8090
+// TODO retrieve the port of the server from configuration defined in 'start.groovy'
+// int port =
 
 // declare the hit counter (AtomicLong)
 AtomicLong hitsL1 = new AtomicLong(0)
