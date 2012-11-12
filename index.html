@@ -54,15 +54,18 @@
 
 
 <div id="title">
-      <span style="font-size:60px;"> vert.x - xke</span>
+    <span style="font-size:60px;"> vert.x - xke</span>
 </div>
 <div id="exo">
     <h3>Installation</h3>
     <ul>
-        <li>installer <a href="http://vertx.io/install.html">vert.x</a> </li>
-        <li>installer <a href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-jdk-7-download-432154.html">jdk7</a></li>
+        <li>installer <a href="http://vertx.io/install.html">vert.x</a> 1.3.0-final</li>
+        <li>installer <a
+                href="http://www.oracle.com/technetwork/java/javase/downloads/java-se-jdk-7-download-432154.html">jdk7</a>
+        </li>
         <li>installer <a href="http://www.mongodb.org/downloads">mongo</a></li>
-        <li>en fonction de votre ide/traitement de texte, vous aurez peut-être envie d'avoir <a href="http://groovy.codehaus.org/Download?nc">groovy</a></li>
+        <li>en fonction de votre ide/traitement de texte, vous aurez peut-être envie d'avoir <a
+                href="http://groovy.codehaus.org/Download?nc">groovy</a></li>
         <li>cloner l'atelier: <span id="code">git clone https://github.com/GuillaumeArnaud/xke-vertx</span></li>
     </ul>
 </div>
@@ -71,24 +74,29 @@
     Le but est de créer un serveur http à l'aide du <a
         href="http://vertx.io/core_manual_groovy.html#routing-http-requests-with-pattern-matching">routeMatcher</a>.
     <ul>
+        <li>ouvrir le fichier <span id="code">start.groovy</span> et <a
+                href="http://vertx.io/core_manual_groovy.html#deploying-and-undeploying-verticles-programmatically">déployer
+            le verticle</a> <span id="code">cache/cache.groovy</span> avec la configuration <span
+                id="code">cacheConf</span></li>
         <li>ouvrir le fichier <span id="code">cache/cache.groovy</span></li>
-        <li>créer un serveur http sur le port <span id="code">8090</span></li>
+        <li>créer un serveur http sur le port <span id="code">8090</span> défini dans <span
+                id="code">start.groovy</span></li>
         <li>ajouter un route matcher qui route l'url <span id="code">http://localhost:8090/#key#/</span> et retournera
             la <span id="code">#key#</span> (<span id="code">#key#</span> sera une
             string arbitraire).
         </li>
-        <li>ouvrir le fichier <span id="code">start.groovy</span> et <a
-                href="http://vertx.io/core_manual_groovy.html#deploying-and-undeploying-verticles-programmatically">déployer
-            le verticle</a> <span id="code">cache/cache/groovy</span></li>
         <li>à la racine du projet, lancer la commande: <span id="code">vertx run start.groovy</span></li>
     </ul>
 
-    <b>résultat:</b> aller sur <span id="code"><a
-        href="http://localhost:8090/toto/">http://localhost:8090/toto/</a></span> sur votre navigateur, la page doit
-    afficher toto.<br><br>
+    <p><b>résultat:</b> aller sur <span id="code"><a
+            href="http://localhost:8090/toto/">http://localhost:8090/toto/</a></span> sur votre navigateur, la page doit
+        afficher toto.</p>
 
-    <b>optionel:</b> ajouter un routage pour récupérer toutes les urls ne matchant pas le path <span
-        id="code">/#key#/</span>.
+    <p><b>optionel:</b> ajouter un routage pour récupérer toutes les urls ne matchant pas le path <span
+            id="code">/#key#/</span>.</p>
+
+    <p><b>conseil:</b> depuis la version 1.3.0, la méthode <span id="code">deployVerticle</span> prend forcément un
+        handler.</p>
 
 </div>
 
@@ -99,10 +107,10 @@
     <p>Le but est d'insérer et de récupérer des documents mongo via le serveur http.</p>
 
     <p>La documentation sur le module <span id="code">mongo-persistor</span> se trouve <a
-            href="https://github.com/vert-x/mod-mongo-persistor">ici</a>. Par contre il ne faut pas le télécharger, il
-        est déjà présent dans le projet.</p>
+            href="https://github.com/vert-x/mod-mongo-persistor">ici</a>.</p>
     <ul>
-        <li>deployer le module <span id="code">vertx.mongo-persistor</span> dans <span id="code">start.groovy</span> à
+        <li>deployer le module <span id="code">vertx.mongo-persistor-v1.2</span> dans <span
+                id="code">start.groovy</span> à
             l'aide de la configuration <span id="code">mongoConf</span> présent dans le fichier.
         </li>
         <li>ajouter un routage sur l'url <span id="code">http://localhost:8090/#key#/#value#/</span></li>
@@ -122,6 +130,8 @@
     <b>résultat:</b> taper <a href="http://localhost:8090/toto/tata/">http://localhost:8090/toto/tata/</a> sur votre
     navigateur. Vérifier qu'un document avec l'id toto
     contient bien la valeur tata à l'aide du shell mongo.<br>
+
+    <p><b>solution:</b> <span id="code">git checkout -b exercice3 origin/exercice3</span></p>
 </div>
 
 <div id="exo">
@@ -130,16 +140,18 @@
     Le but est de créer un injecteur pour le serveur http précédent.
 
     <ul>
-        <li>dans le fichier <span id="code">injector/injector.groovy</span>, ajouter les requêtes pour insérer et récupérer les clés/valeurs
+        <li>dans le fichier <span id="code">injector/injector.groovy</span>, ajouter les requêtes pour insérer et
+            récupérer les clés/valeurs
         </li>
         <li>dans le répertoire injector, lancer la commande: <span id="code">vertx run injector.groovy</span></li>
     </ul>
 
     <p><b>résultat:</b> faites tourner l'injection quelques secondes et vérifier qu'on a bien les valeurs attendues.</p>
 
-    <p><b>optionel:</b> remplacer le <span id="code">setPeriodic</span> par une itération (par ex. <span id="code">100.times{...}</span>) et remplacer le <span id="code">setTimer</span> par un
-    sleep. Lancer le test et observer.</p>
-    <p><b>solution:</b> <span id="code">git checkout -b exercice3 origin/exercice3</span></p>
+    <p><b>optionel:</b> remplacer le <span id="code">setPeriodic</span> par une itération (par ex. <span id="code">100.times{...}</span>)
+        et remplacer le <span id="code">setTimer</span> par un
+        sleep. Lancer le test et observer.</p>
+
 </div>
 <div id="exo">
     <h3>Exercice 4</h3>
@@ -157,12 +169,14 @@
 <div id="exo">
     <h3>Exercice 5</h3>
 
-    Le but est de faire un cache de niveau 2 (L2) à l'aide du <a href="http://vertx.io/core_manual_groovy.html#shared-data">shared map</a> de vertx.
+    Le but est de faire un cache de niveau 2 (L2) à l'aide du <a
+        href="http://vertx.io/core_manual_groovy.html#shared-data">shared map</a> de vertx.
 
     <ul>
         <li>ajouter une map partagée à l'aide <span id="code">vertx.sharedData</span></li>
         <li>dans le handler qui insére la donnée, insérer aussi le document dans le cache L2</li>
-        <li>ajouter également dans ce handler un timer qui supprimera l'élément du cache L2 au bout d'un temps <span id="code">TTL_L2</span>
+        <li>ajouter également dans ce handler un timer qui supprimera l'élément du cache L2 au bout d'un temps <span
+                id="code">TTL_L2</span>
         </li>
         <li>dans le handler qui récupère la donnée, avant de récupérer la valeur dans mongo, tester si elle existe dans
             L2 et si c'est le cas, retourner la valeur.
@@ -172,7 +186,10 @@
 
     <p><b>résultat:</b> vérifier que l'injection se passe toujours bien.</p>
 
-    <p><b>conseil:</b> utiliser la classe <span id="code">Json</span> de vertx pour sérialiser le document dans la map partagée.</p>
+    <p><b>conseil:</b> utiliser la classe <span id="code">Json</span> de vertx pour sérialiser le document dans la map
+        partagée.</p>
+
+    <p><b>solution:</b> <span id="code">git checkout -b exercice6 origin/exercice6</span></p>
 </div>
 <div id="exo">
 
@@ -181,59 +198,73 @@
     Le but est de tester le mode <a href="http://vertx.io/manual.html#running-verticles-directly">cluster</a>.
 
     <ul>
-        <li>dans le document mongo, ajouter un champ <span id="code">port</span> qui contiendra le numéro de port http</li>
         <li>lancer l'instance: <span id="code">vertx run start.groovy -cluster</span></li>
-        <li>changer le port d'écoute http</li>
+        <li>changer le port d'écoute http dans <span id="code">cacheConf</span> et changer de base mongo en <span
+                id="code">xke2</span> avec
+            <span id="code">db_name</span> dans <span id="code">mongoConf</span>.
+        </li>
         <li>lancer l'instance: <span id="code">vertx run start.groovy -cluster -cluster-port 1234</span></li>
         <li>lancer l'injection (en restant sur le port <span id="code">8090</span>)</li>
     </ul>
 
-    <p><b>résultat:</b> dans le shell mongo, vérifier que certains documents contiennent le port du deuxième noeud. A
-    l'aide des logs, vérifier que sur le deuxième noeud on récupère bien des valeurs du cache L2 (la map est partagée sur les
-    différents noeuds).</p>
+    <p><b>résultat:</b> dans le shell mongo, vérifier que la base <span id="code">xke2</span> est bien alimentée.</p>
 
-    <p><b>optionel:</b> on peut faire le même test en lançant plusieurs instances verticle et vérifier que la map est bien
-    partagée sur plusieurs instances aussi.</p>
-
-    <p><b>solution:</b> <span id="code">git checkout -b exercice6 origin/exercice6</span></p>
+    <p><b>conseil:</b> les premiers tests devraient générer des logs d'erreurs sur le fait qu'on ne peut pas utiliser
+        <span id="code">NetClient</span> dans un <span id="code">worker</span>. C'est effectivement une limitation dans
+        vert.x. Pour le test on peut désactiver le mode <span id="code">worker</span> dans le fichier <span id="code">mods/vertx/mongo-persistor-v1.2/mod.json</span>.
+    </p>
 
 </div>
 <div id="exo">
 
     <h3>Exercice 7</h3>
 
-    Le but est d'ajouter une page de monitoring du cache alimentée par une <a href="http://vertx.io/core_manual_groovy.html#websockets">websocket</a>.
+    Le but est d'ajouter une page de monitoring du cache alimentée par une <a
+        href="http://vertx.io/core_manual_groovy.html#websockets">websocket</a>.
 
     <ul>
-        <li>dans le fichier <span id="code">monitor/monitor.groovy</span>, <a href="Serving files directly from disk">charger le fichier</a> <span id="code">monitor/index.html</span> et les javascripts</li>
+        <li>dans le fichier <span id="code">monitor/monitor.groovy</span>, <a href="Serving files directly from disk">charger
+            le fichier</a> <span id="code">monitor/index.html</span> et les javascripts
+        </li>
         <li>configurer un serveur SockJS ainsi qu'un bridge sur <span id="code">/monitor-evt-bus</span></li>
-        <li>périodiquement envoyer des éléments dans mongo sur le bus d'évènement <span id="code">mongostat.count</span></li>
-        <li>dans le fichier <span id="code">monitor/index.html</span>, ajouter un handler qui écoute sur le bus d'évènement <span id="code">mongostat.count</span> et
+        <li>périodiquement envoyer des éléments dans mongo sur le bus d'évènement <span id="code">mongostat.count</span>
+        </li>
+        <li>dans le fichier <span id="code">monitor/index.html</span>, ajouter un handler qui écoute sur le bus
+            d'évènement <span id="code">mongostat.count</span> et
             alimente le graphique <a href="http://www.highcharts.com/">Highchart</a> qui se nomme <span id="code">countChart</span>
         </li>
         <li>ajouter le verticle <span id="code">monitor/monitor.groovy</span> dans le container</li>
         <li>lancer l'application</li>
     </ul>
 
-    <p><b>résultat:</b> sur l'url <a href="http://localhost:8095/">http://localhost:8095/</a> on devrait un graphe, mis à jour toutes les 2s et avec les valeurs
-    envoyées.</p>
+    <p><b>résultat:</b> sur l'url <a href="http://localhost:8095/">http://localhost:8095/</a> on devrait un graphe, mis
+        à jour toutes les 2s et avec les valeurs
+        envoyées.</p>
+
     <p><b>conseil:</b> pour charger le fichier html utiliser <span id="code">sendFile</span>.</p>
+
     <p><b>conseil:</b> pour ajouter un point sur un graphique Highchart:
-        <span id="code">countChart.series[0].addPoint([x,y], true, true);</span> où <span id="code">x</span> est la date et <span id="code">y</span> le nombre d'éléments.
+        <span id="code">countChart.series[0].addPoint([x,y], true, true);</span> où <span id="code">x</span> est la date
+        et <span id="code">y</span> le nombre d'éléments.
     </p>
+
+    <p><b>solution:</b> <span id="code">git checkout -b exercice8 origin/exercice8</span></p>
 </div>
 <div id="exo">
 
     <h3>Exercice 8</h3>
 
-    <p>Le but est que la page de monitoring (js) interroge directement les noeuds du cache pour récupérer le nombre de hit
-    L1 et L2.</p>
+    <p>Le but est que la page de monitoring (js) interroge directement les noeuds du cache pour récupérer le nombre de
+        hit
+        L1 et L2.</p>
 
     <ul>
         <li>dans le fichier <span id="code">cache/cache.groovy</span>, incrémenter les compteurs hitsL1 et hitsL2</li>
-        <li>ajouter deux handlers sur l'event bus aux adresses <span id="code">mongostat.l1.hit</span> et <span id="code">mongostat.l2.hit</span> qui feront un reply du message avec la valeur de compteur.
+        <li>ajouter deux handlers sur l'event bus aux adresses <span id="code">mongostat.l1.hit</span> et <span
+                id="code">mongostat.l2.hit</span> qui feront un reply du message avec la valeur de compteur.
         </li>
-        <li>dans le fichier <span id="code">monitor/index.html</span>, à l'aide d'envoi sur l'event bus aux adresses précédentes, récupérer les
+        <li>dans le fichier <span id="code">monitor/index.html</span>, à l'aide d'envoi sur l'event bus aux adresses
+            précédentes, récupérer les
             valeurs de hits et afficher ces valeurs dans la page
         </li>
         <li>lancer et l'application puis l'injection</li>
@@ -241,25 +272,27 @@
 
     <p><b>résultat:</b> les compteurs doivent s'incrémenter dans l'url.</p>
 
-    <p><b>solution:</b> <span id="code">git checkout -b exercice8 origin/exercice8</span></p>
-
 </div>
 <div id="exo">
 
     <h3>Exercice 9</h3>
 
-    <p>Le but est de l'exercice est de créer un <a href="http://vertx.io/mods_manual.html">module</a> qui s'occupe d'envoyer les insertions mongo d'un verticle à un
-    autre grâce à une connexion tcp.</p>
+    <p>Le but est de l'exercice est de créer un <a href="http://vertx.io/mods_manual.html">module</a> qui s'occupe
+        d'envoyer les insertions mongo d'un verticle à un
+        autre grâce à une connexion tcp.</p>
 
     <ul>
         <li>remplir le fichier <span id="code">mods/mod-replica/mod.json</span></li>
         <li>ajouter la réplication dans le script <span id="code">mods/mod-replica/replicator.groovy</span></li>
-        <li>dans le fichier <span id="code">cache/cache.groovy</span>, lorsque l'insertion dans mongo a été validée, ajouter un envoi du
+        <li>dans le fichier <span id="code">cache/cache.groovy</span>, lorsque l'insertion dans mongo a été validée,
+            ajouter un envoi du
             document sur le bus d'événement à l'adresse <span id="code">replica</span>
         </li>
         <li>deployer le nouveau module <span id="code">mod-replica</span> dans <span id="code">start.groovy</span></li>
-        <li>lancer deux instances, l'une en tant que serveur et l'autre en tant que client (cf. <span id="code">replicaConf</span> dans
-            <span id="code">start.groovy</span>). Les deux instances doivent avoir des ports http différents et un nom de base mongo différent.
+        <li>lancer deux instances, l'une en tant que serveur et l'autre en tant que client (cf. <span id="code">replicaConf</span>
+            dans
+            <span id="code">start.groovy</span>). Les deux instances doivent avoir des ports http différents et un nom
+            de base mongo différent.
         </li>
         <li>lancer l'injection sur l'une des deux instances</li>
     </ul>
